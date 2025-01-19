@@ -23,41 +23,51 @@ def link(name):
 def icon():
     return '', 404
 
-@main_bp.route("/add_link", methods=['POST'])
+@main_bp.route("/link", methods=['POST'])
 def add_link():
     try:
-        data = request.form
-        name = data['name']
+        try:
+            data = request.form
+            name = data['name']
 
-        if name == None:
-            return "name can't be None"
+            if name == None:
+                return "name can't be None", 403
 
-        if check_exsist(name) == True:
-            return "your link name not unique", 302
-        
-        link = data["link"]
+            if check_exsist(name) == True:
+                return "your link name not unique", 403
+            
+            try:
+                link = data["link"]
 
-        add_rec(link, name)
+                add_rec(link, name)
 
-        return "Link added"
+                return "Link added"
+            except:
+                return "Link was't transmitted", 403
+        except:
+            return "Name was't transmitted", 403
 
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/get_link", methods=['GET'])
+@main_bp.route("/link", methods=['GET'])
 def get_link():
     try:
         try:
             name = request.args.get('name')
+            name = get_rec(name)
+
             if name:
-                name = get_rec(name)
                 return f"{name[0]}"
+            
+            return "This name is not in db", 500
+
         except:
-            return "The parameter does not exist"
+            return "Name was't transmitted", 403
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/upd_link", methods=['PUT'])
+@main_bp.route("/link", methods=['PUT'])
 def upd_link():
     try:
         data = request.form
@@ -88,18 +98,21 @@ def upd_link():
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/del_link", methods=['DELETE'])
+@main_bp.route("/link", methods=['DELETE'])
 def del_link():
     try:
-        data = request.form
-        name = data['name']
+        try:
+            data = request.form
+            name = data['name']
 
-        if check_exsist(name) == False:
-            raise Exception
+            if check_exsist(name) == False:
+                return "This name is not in db", 500
 
-        delete_rec(name)
+            delete_rec(name)
 
-        return "Record deleted successfully"
+            return "Record deleted successfully"
+        except:
+            return "Name was't transmitted", 403
     except:
         return redirect(url_for('backend.error')), 302
 
