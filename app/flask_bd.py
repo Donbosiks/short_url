@@ -50,15 +50,14 @@ def add_link():
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/link", methods=['GET'])
-def get_link():
+@main_bp.route("/link/<name>", methods=['GET'])
+def get_link(name):
     try:
         try:
-            name = request.args.get('name')
             name = get_rec(name)
 
             if name:
-                return f"{name[0]}"
+                return f"{name[0]}", 200
             
             return "This name is not in db", 500
 
@@ -67,28 +66,26 @@ def get_link():
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/link", methods=['PUT'])
-def upd_link():
+@main_bp.route("/link/<name>", methods=['PUT'])
+def upd_link(name):
     try:
         data = request.form
         upd = data['upd']
         
         match upd:
             case "name":
-                name = data['name']
 
                 if check_exsist(name) == False:
-                    raise Exception
+                    return "This name is not in db", 500
 
                 new_name = data['new_name']
                 update_name(name, new_name)
 
                 return "Name updated successfully"
             case "link":
-                name = data['name']
 
                 if check_exsist(name) == False:
-                    raise Exception
+                    return "This name is not in db", 500
 
                 new_link = data['new_link']
                 update_link(name, new_link)
@@ -98,12 +95,10 @@ def upd_link():
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/link", methods=['DELETE'])
-def del_link():
+@main_bp.route("/link/<name>", methods=['DELETE'])
+def del_link(name):
     try:
         try:
-            data = request.form
-            name = data['name']
 
             if check_exsist(name) == False:
                 return "This name is not in db", 500
