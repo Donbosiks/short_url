@@ -1,5 +1,6 @@
-from flask import Blueprint, redirect, url_for, request
+from flask import Blueprint, redirect, url_for, request, jsonify
 from app.db_control import check_exsist, add_rec, get_rec, update_name, update_link, delete_rec
+import yaml
 
 main_bp = Blueprint('backend', __name__)
 
@@ -41,7 +42,7 @@ def add_link():
 
                 add_rec(link, name)
 
-                return "Link added"
+                return "Link added", 200
             except:
                 return "Link was't transmitted", 403
         except:
@@ -66,11 +67,10 @@ def get_link(name):
     except:
         return redirect(url_for('backend.error')), 302
 
-@main_bp.route("/link/<name>", methods=['PUT'])
-def upd_link(name):
+@main_bp.route("/link/<upd>/<name>", methods=['PUT'])
+def upd_link(upd, name):
     try:
         data = request.form
-        upd = data['upd']
         
         match upd:
             case "name":
@@ -81,7 +81,7 @@ def upd_link(name):
                 new_name = data['new_name']
                 update_name(name, new_name)
 
-                return "Name updated successfully"
+                return "Name updated successfully", 200
             case "link":
 
                 if check_exsist(name) == False:
@@ -90,7 +90,7 @@ def upd_link(name):
                 new_link = data['new_link']
                 update_link(name, new_link)
 
-                return "Link updated successfully"
+                return "Link updated successfully", 200
 
     except:
         return redirect(url_for('backend.error')), 302
@@ -105,7 +105,7 @@ def del_link(name):
 
             delete_rec(name)
 
-            return "Record deleted successfully"
+            return "Record deleted successfully", 200
         except:
             return "Name was't transmitted", 403
     except:
@@ -114,3 +114,10 @@ def del_link(name):
 @main_bp.route("/error")
 def error():
     return "this url not found or an unknown error occurred"
+
+# Эндпоинт для проверки работы
+@main_bp.route('/api', methods=['GET'])
+def api_info():
+    with open('swagger.yaml', 'r') as file:
+        swagger_info = yaml.safe_load(file)
+    return jsonify(swagger_info)

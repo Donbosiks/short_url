@@ -1,0 +1,164 @@
+openapi: 3.0.0
+info:
+  title: Link shortener - Python 3.10
+  description: |-
+    This is a small project written in flask and python to create your own personal shortened links.
+    
+    The project is not protected by copyright and can be used in your projects further. Its essence was that the author learned how to make such sites and provide a portfolio for employers.
+  version: 1.0.0
+servers:
+  - url: https://0.0.0.0/
+    description: main server
+paths:
+  /link:
+    post:
+      summary: Method to add one link
+      description: Add link
+      parameters:
+        - name: name
+          in: query
+          description: Name what we want to see in db
+          required: true
+          style: form
+          schema:
+            type: string
+        - name: link
+          in: query
+          description: Link what we want to see in db
+          required: true
+          style: form
+          schema:
+            type: string
+              
+      tags:
+        - Link
+      operationId: addOneLink
+      responses:
+        '200':
+          description: Return a string
+          content:
+            text/plain:
+              example: Link added
+        '403':
+          description: One of many errors
+          content:
+            text/plain:
+              example: 
+                - Name was't transmitted
+                - Name can't be None
+                - Your link name not unique
+                - Link was't transmitted
+
+
+
+  /link/{name}:
+    get:
+      summary: Method to get one link
+      description: Get one link searching by name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      
+      tags:
+        - Link
+      operationId: getOneLink
+      responses:
+        '200':
+          description: Return a reference link from the databases
+          content:
+            text/plain:
+              example: https://example.com/
+        '302':
+          description: Redirect to error page
+        '403':
+          description: Name was't transmitted
+          content:
+            text/plain:
+              example: Name was't transmitted
+        '500':
+          description: Name not found in db
+          content:
+            text/plain:
+              example: This name is not in db
+    delete:
+      summary: Method to get one link
+      description: Delete record from database searching by name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Link
+      operationId: delOneLink
+      responses:
+        '200':
+          description: Return a text
+          content:
+            text/plain:
+              example: Record deleted successfully
+        '302':
+          description: Redirect to error page
+        '403':
+          description: Name was't transmitted
+          content:
+            text/plain:
+              example: Name was't transmitted
+        '500':
+          description: Name not found in db
+          content:
+            text/plain:
+              example: This name is not in db
+
+  /link/{upd}/{name}:
+    put:
+      summary: Method to update record
+      description: Update link or name searching by name
+      parameters:
+        - name: upd
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            
+        - name: new_name
+          in: query
+          description: New name what we want to see in db
+          required: false
+          style: form
+          schema:
+            type: string
+        - name: new_link
+          in: query
+          description: New link what we want to see in db
+          required: false
+          style: form
+          schema:
+            type: string
+      tags:
+        - Link
+      operationId: updateOnerecord
+      responses:
+        '200':
+          description: Return a text
+          content:
+            text/plain:
+              example: Link updated successfully
+        '302':
+          description: Redirect to error page
+        '500':
+          description: Name was't transmitted
+          content:
+            text/plain:
+              example: This name is not in db
+        
+
